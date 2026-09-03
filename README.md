@@ -30,7 +30,7 @@ Every action passes through the recovery policy.
 
 ## What RecoverAI Does
 
-For a failed payment, RecoverAI:
+For a failed payment:
 
 1. Retrieves the payment details.
 2. Retrieves the customer's payment history.
@@ -125,26 +125,27 @@ The policy engine is responsible for enforcing boundaries.
 This separation prevents the model from bypassing business rules even if it makes a poor decision.
 
 ## Recovery Policies & Guardrails:
-RecoverAI currently enforces several stopping rules.
+- RecoverAI currently enforces several stopping rules.
 
-Payment retry limit--
+- Payment retry limit --
 A payment cannot be retried once the maximum retry limit has been reached.
 
-Customer intervention limit --
+- Customer intervention limit --
 A customer cannot be subjected to unlimited recovery interventions.
 
-Non-retryable failures --
-Some failure reasons are not eligible for automatic retries.
-Examples:
-Card_Expired
-Insufficient_Funds
+- Non-retryable failures --
+Some failure reasons are not eligible for automatic retries. <br>
+
+### Examples: <br>
+ Card_Expired <br>
+ Insufficient_Funds <br>
 These are routed toward escalation/payment-link recovery instead.
 
-Unknown failures --
+- Unknown failures --
 Unknown failure reasons fail closed.
 If RecoverAI does not know whether an automatic action is safe, it does not take the action.
 
-Failed recovery --
+- Failed recovery --
 If an allowed retry itself fails, RecoverAI can move the payment into an escalation path rather than repeatedly retrying it.
 
 ---
@@ -187,3 +188,41 @@ A production version could connect the same recovery workflow to:
 - production monitoring and observability
   
 The core recovery policy remains deterministic even when the surrounding infrastructure is replaced with production services.
+
+---
+
+## Run Locally:
+```text
+1. Clone the repository:
+- git clone <https://github.com/Sankalp1025/RecoverAI---Revenue-recovery-AI-agent.git>
+- cd RecoverAI
+
+2. Install dependencies:
+- npm install
+
+3. Configure Gemini:
+- Create a .env file in the project root:  GEMINI_API_KEY=your_api_key
+- NOTE:- Never commit your API key to GitHub.
+
+4. Type-check the project:
+- npx tsc --noEmit
+
+5. Run the AI recovery agent:
+- npx tsx src/index.ts
+
+This runs the single-payment agent flow and prints:
+- payment details
+- customer history
+- Gemini tool calls
+- recovery result
+- final agent response
+- audit trail
+
+6. Run the batch simulation:
+- npx tsx src/batch.ts
+- This processes the 100-payment synthetic dataset and prints recovery metrics.
+
+7. Run the dashboard:
+- npx tsx src/server.ts
+```
+//////////////////////////////////////////////////////////////////////////////////////////
